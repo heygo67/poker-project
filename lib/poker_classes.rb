@@ -1,43 +1,57 @@
 class Card
-    def self.identify(deck)
-        card = []
-        suit = deck[0][0]
-        value = deck[0][1]
-        card << suit
-        card << value
-        return card
+    attr_reader :suit, :value
+  
+    def initialize(suit, value)
+        @suit = suit
+        @value = value
     end
-end
+    
+    def self.identify(deck)
+        if deck.empty?
+            return nil
+        else
+            suit = card[0]
+            value = card[1]
+            return [suit, value]
 
+        end
+    end
+      
+
+end
+  
 class Deck
-    def self.generate_shuffled_deck()
+    attr_reader :cards
+  
+    def initialize
+        @cards = self.class.generate_shuffled_deck
+    end
+  
+    def self.generate_shuffled_deck
         deck = []
         type_suits = ["Spades", "Hearts", "Clubs", "Diamonds"]
         type_values = ["Ace", 2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King"]
         type_suits.each do |suit|
-            type_values.each do |value|
-                deck << [suit, value]
-            end
+          type_values.each do |value|
+            deck << [suit, value]
+          end
         end
         return deck.shuffle
     end
-
-
-    def self.deal_card(deck)
-        card = Card.identify(deck)
-        return card
+      
+  
+    def deal_card
+        @cards.pop
     end
-
 end
-
+  
 class Hand
     def self.create_hand(amount, players)
         hand = []
         count = 0
-        shuffled_deck = Deck.generate_shuffled_deck()
+        deck = Deck.new
         while count < amount
-            next_card = Deck.deal_card(shuffled_deck)
-            shuffled_deck.delete next_card
+            next_card = deck.deal_card
             hand << next_card
             count += 1
         end
@@ -123,38 +137,103 @@ class Hand
         end
     end
 end
-
+  
 class Player
-    def initialize()
-        @player = player
+    attr_accessor :hand, :pot
+  
+    def initialize(hand, pot = 0)
+        @hand = hand
+        @pot = pot
     end
-
+      
+  
+    def discard_cards(cards_to_discard)
+        cards_to_discard.each do |card|
+        @hand.delete(card)
+      end
+    end
+  
+    def choose_action
+        puts "Player's current hand: #{hand}"
+        puts "Options:"
+        puts "1. Fold"
+        puts "2. See"
+        puts "3. Raise"
+        print "Enter your choice (1-3): "
+        choice = gets.chomp.to_i
+    
+        case choice
+        when 1
+            return "Fold"
+        when 2
+            return "See"
+        when 3
+            return "Raise"
+        else
+            puts "Invalid choice. Please enter a number between 1 and 3."
+            choose_action
+        end
+    end
 end
+  
 
 class Game
-    def init_players()
-        players_list = []
-        puts "How many players?"
-        players_count = gets.chomp
-        players_list << Player.setup(players_count)
-        return players_count
+    attr_reader :deck, :players, :current_player_index, :pot
+  
+    def initialize(players)
+        @deck = Deck.new
+        @players = players
+        @current_player_index = 0
+        @pot = 0
     end
-
-    def self.start_game()
-        puts "Dealing 5 cards"
-        hand = Hand.create_hand(5, 5)
-        puts "Player receives a new hand containing:"
-        card_index = 0
-        for card in hand
-            puts "#{hand[card_index][1]} of #{hand[card_index][0]}"
-            card_index += 1
+  
+    def start_round
+        Hand.create_hand(5, @players)
+        place_bets
+        collect_bets
+        determine_winner
+        end_round
+    end
+  
+    private
+  
+    def place_bets
+        players.each do |player|
+            puts "Player #{players.index(player) + 1}'s turn:"
+            action = player.choose_action
+            case action
+                when "Fold"
+                    puts "Player #{players.index(player) + 1} folds."
+                    next
+                when "See"
+                    @pot += 10
+                    player.pot -= 10
+                when "Raise"
+                    puts "Raise feature not implemented yet."
+            end
         end
-        hand_type = Hand.hand_type(hand)
-        puts hand_type.inspect
+    end
+  
+    def collect_bets
+        puts "Collecting bets..."
+    end
+  
+    def determine_winner
+        puts "Determining the winner..."
+    end
+  
+    def end_round
+        puts "Ending the round..."
     end
 end
 
+game1 = Game.new([
+    Player.new(Hand.create_hand(5, 5), 100),  # Player 1 with a hand of 5 cards and a pot of 100
+    Player.new(Hand.create_hand(5, 5), 100)   # Player 2 with a hand of 5 cards and a pot of 100
+])
 
-game = Game.start_game()
+game1.start_round
+  
+
 
 

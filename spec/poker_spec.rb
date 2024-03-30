@@ -71,3 +71,8 @@ RSpec.describe Hand do
 
     
 end
+
+
+RSpec.describe Game do
+    
+end
