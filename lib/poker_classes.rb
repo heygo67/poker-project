@@ -209,17 +209,32 @@ class Game
                     @pot += 10
                     player.pot -= 10
                 when "Raise"
-                    puts "Raise feature not implemented yet."
+                    puts "Enter the amount to raise:"
+                    amount = gets.chomp.to_i
+                    if amount <= player.pot
+                        @pot += amount
+                        player.pot -= amount
+                    else
+                        puts "Invalid amount. Cannot raise more than what's in the pot."
+                        place_bets
+                    end
             end
         end
     end
   
     def collect_bets
         puts "Collecting bets..."
+        players.each do |player|
+            @pot += player.pot
+            player.pot = 0
+        end
     end
   
     def determine_winner
         puts "Determining the winner..."
+        hand_types = players.map { |player| Hand.hand_type(player.hand) }
+        winner_index = hand_types.index(hand_types.max)
+        puts "Player #{winner_index + 1} wins with a #{hand_types[winner_index]}"
     end
   
     def end_round
@@ -228,8 +243,8 @@ class Game
 end
 
 game1 = Game.new([
-    Player.new(Hand.create_hand(5, 5), 100),  # Player 1 with a hand of 5 cards and a pot of 100
-    Player.new(Hand.create_hand(5, 5), 100)   # Player 2 with a hand of 5 cards and a pot of 100
+    Player.new(Hand.create_hand(5, 5), 100),  
+    Player.new(Hand.create_hand(5, 5), 100)   
 ])
 
 game1.start_round
