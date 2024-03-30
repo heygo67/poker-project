@@ -89,6 +89,39 @@ class Hand
             return "High Card"
         end
     end
+
+    def self.compare_hand_types(hand1, hand2)
+
+        hand_type_hierarchy = [
+            "Straight Flush",
+            "Four of a Kind",
+            "Full House",
+            "Flush",
+            "Straight",
+            "Three of a Kind",
+            "Two Pair",
+            "One Pair",
+            "High Card"
+        ]
+
+        hand_type1 = Hand.hand_type(hand1)
+        hand_type2 = Hand.hand_type(hand2)
+
+        index1 = hand_type_hierarchy.index(hand_type1)
+        index2 = hand_type_hierarchy.index(hand_type2)
+    
+        if index1 && index2
+            if index1 < index2
+                return "Hand 1 wins with #{hand_type1}"
+            elsif index1 > index2
+                return "Hand 2 wins with #{hand_type2}"
+            else
+                return "It's a tie"
+            end
+        else
+            return "Invalid hand type"
+        end
+    end
 end
 
 class Player
